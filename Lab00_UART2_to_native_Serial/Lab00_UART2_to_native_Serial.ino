@@ -1,4 +1,4 @@
-if defined(ESP32)
+#if defined(ESP32)
 //The HardwareSerial line assigns Serial to pins 16 and 17. ESP UART2
 //UART1 is connect to Flash memory need patch Library
 HardwareSerial Serial1(2);
@@ -6,6 +6,8 @@ HardwareSerial Serial1(2);
 
 void setup() {
   Serial.begin(115200);
+  Serial1.begin(9600, SERIAL_8N1, 17, 16);
+
   while (!Serial){
     ;
   }
