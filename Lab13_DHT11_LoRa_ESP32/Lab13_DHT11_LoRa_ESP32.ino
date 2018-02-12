@@ -14,11 +14,11 @@ HardwareSerial& LoRaUART = Serial1;
 #define DHTTYPE DHT11   // DHT 11 
 DHT dht(DHTPIN, DHTTYPE);
 String sensorData;
-const int DTX_LED_PIN = 13;
+const int DTX_LED_PIN = 5;
 boolean ledState = false;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
