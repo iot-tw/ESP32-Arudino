@@ -6,7 +6,7 @@ HardwareSerial Serial1(2);
 // LoRaSerial Port Arduino Mega 2560 //Tx2,Rx2
 HardwareSerial& LoRaUART = Serial1;
 //SoftwareSerial LoRaUART(10, 11); // to TX, to RX
-const int variable = 36;
+const int GPIO_PIN = 36; //ADC0 = GPIO36
 
 void setup() {
   Serial.begin(115200);
@@ -26,7 +26,7 @@ void setup() {
 }
 
 void loop() {
-  int sensorValue = analogRead(variable);
+  int sensorValue = analogRead(GPIO_PIN);
   String sensorData;
   sensorData = String(sensorValue);
   Serial.println(sensorData);
