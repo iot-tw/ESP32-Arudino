@@ -6,19 +6,19 @@
 *****************************************************/
 //The HardwareSerial line assigns Serial to pins 16 and 17. ESP UART2
 //UART1 is connect to Flash memory need patch Library
-HardwareSerial Serial1(2);
-HardwareSerial& LoRaUART = Serial1;
-/* DHT */
+HardwareSerial Serial1(2);  //Tx2 Rx2 be Serial1
+HardwareSerial& LoRaUART = Serial1; // LoRaUART = Serial1
+/* DHT , Library Key Word= Adafruit Unified Sensor, DHT Sersor Library*/
 #include "DHT.h"
-#define DHTPIN 23     // what pin we're connected to
+#define DHTPIN 23     // what pin we're connected to GPIO23
 #define DHTTYPE DHT11   // DHT 11 
 DHT dht(DHTPIN, DHTTYPE);
 String sensorData;
-const int DTX_LED_PIN = 13;
+const int DTX_LED_PIN = 5;
 boolean ledState = false;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
 
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
@@ -39,7 +39,7 @@ void loop()
 {
   ledState = !ledState;
   digitalWrite(DTX_LED_PIN, ledState);
-  delay(5 * 1000);
+  delay(3 * 1000);
   float h = dht.readHumidity();
   float t = dht.readTemperature();
   if (isnan(h) || isnan(t)) {
