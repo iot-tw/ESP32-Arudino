@@ -1,9 +1,15 @@
-/***************************************************** 
-* ESP32 DHT Reading 
-* DHT Input: ==> GPIO23.
-* 讀取DHT11 溫濕度計，通過LoRa 模組發送出去。
-* MJRoBot.org 9Sept17
-*****************************************************/
+#include <SPI.h>
+#include <Wire.h>
+#include <Adafruit_GFX.h>
+// Sh1106 Library https://github.com/nhatuan84/esp32-sh1106-oled/archive/master.zip
+// 1.3" 
+#include <Adafruit_SH1106.h>
+
+#define OLED_SDA 21
+#define OLED_SCL 22
+
+Adafruit_SH1106 display(OLED_SDA, OLED_SCL);
+
 //The HardwareSerial line assigns Serial to pins 16 and 17. ESP UART2
 //UART1 is connect to Flash memory need patch Library
 HardwareSerial Serial1(2);  //Tx2 Rx2 be Serial1
@@ -12,18 +18,16 @@ HardwareSerial& LoRaUART = Serial1; // LoRaUART = Serial1
 #include "DHT.h"
 #define DHTPIN 23     // what pin we're connected to GPIO23
 #define DHTTYPE DHT11   // DHT 11 
-
-#include <Wire.h>
-#include "SSD1306.h" 
-SSD1306  display(0x3c, 21, 22); // OLED use 21,22 pin
 DHT dht(DHTPIN, DHTTYPE);
 String sensorData;
 const int DTX_LED_PIN = 5;
 boolean ledState = false;
 
-void setup() {
+void setup()   {                
   Serial.begin(115200);
-
+  /* initialize OLED with I2C address 0x3C */
+  display.begin(SH1106_SWITCHCAPVCC, 0x3C); 
+  display.clearDisplay();
   while (!Serial) {
     ; // wait for serial port to connect. Needed for native USB port only
   }
@@ -37,15 +41,17 @@ void setup() {
   Serial.println("LoRa Serial Ready");
   dht.begin();
   pinMode(DTX_LED_PIN, OUTPUT);
-  display.init();
-  //display.flipScreenVertically();
-  //display.setFont(ArialMT_Plain_10);
-  display.drawString(0, 0, "Hello Go");
+  display.setTextSize(1);
+  display.setTextColor(WHITE);
+  display.setCursor(0,0);
+  display.println("Ready, Go!");
   display.display();
+  delay(2000);
 }
-
-void loop()
-{
+void loop() { 
+  /* set text size, color, cursor position, 
+  set buffer with  Hello world and show off*/
+ 
   ledState = !ledState;
   digitalWrite(DTX_LED_PIN, ledState);
   delay(3 * 1000);
@@ -53,8 +59,9 @@ void loop()
   float t = dht.readTemperature();
   if (isnan(h) || isnan(t)) {
     Serial.println("Failed to read from DHT sensor!");
-    display.clear();
-    display.drawString(0, 0, "Failed to Read DHT");
+    display.clearDisplay();
+    display.setCursor(0,0);
+    display.println("Failed to read from DHT sensor!");
     display.display();
     return;
   }
@@ -62,9 +69,10 @@ void loop()
   sensorData = String(h, 2) + "/" + String(t, 2);
   Serial.println("value:"+sensorData);
   LoRaUART.println("AT+DTX=11,\"" + sensorData + "\"");
-  display.clear(); 
-  display.drawString(0,0,"Humi./Temp.");
-  display.drawString(0, 15, sensorData);
+  display.clearDisplay(); 
+  display.setCursor(0,0);
+  display.println("Humi./Temp.");
+  display.setCursor(0,10);
+  display.println(sensorData);
   display.display();
 }
-
